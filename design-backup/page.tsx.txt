@@ -1,0 +1,124 @@
+import Link from "next/link";
+
+const sports = [
+  {
+    href: "/soccer",
+    emoji: "⚽",
+    name: "Soccer",
+    tagline: "One career. No restarts.",
+    available: true,
+  },
+  {
+    href: null,
+    emoji: "🏀",
+    name: "Basketball",
+    tagline: "Draft to dynasty.",
+    available: false,
+  },
+  {
+    href: null,
+    emoji: "🏈",
+    name: "Football",
+    tagline: "From walk-on to the Hall.",
+    available: false,
+  },
+];
+
+export default function Home() {
+  return (
+    <div style={{ width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", gap: 0 }}>
+      <div style={{ marginBottom: 28, textAlign: "center" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8, justifyContent: "center" }}>
+          <span className="ttl" style={{ fontSize: 38, color: "var(--lime)" }}>THE RUN</span>
+          <span className="ttl" style={{ fontSize: 38 }}>OF PLAY</span>
+        </div>
+        <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+          Choose your sport. Build your legacy.
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {sports.map((s) =>
+          s.available ? (
+            <Link key={s.name} href={s.href!} style={{ textDecoration: "none" }}>
+              <div
+                className="chip"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: "18px 18px",
+                  borderColor: "var(--lime)",
+                  background: "#16301f",
+                  boxShadow: "0 0 0 1px var(--lime) inset",
+                }}
+              >
+                <span style={{ fontSize: 36, lineHeight: 1 }}>{s.emoji}</span>
+                <div>
+                  <div className="ttl" style={{ fontSize: 22, color: "var(--lime)" }}>{s.name}</div>
+                  <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{s.tagline}</div>
+                </div>
+                <div style={{ marginLeft: "auto", color: "var(--lime)", fontSize: 20, fontFamily: "var(--font-anton)" }}>
+                  →
+                </div>
+              </div>
+            </Link>
+          ) : (
+            <div
+              key={s.name}
+              className="chip"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                padding: "18px 18px",
+                opacity: 0.45,
+                cursor: "default",
+              }}
+            >
+              <span style={{ fontSize: 36, lineHeight: 1 }}>{s.emoji}</span>
+              <div>
+                <div className="ttl" style={{ fontSize: 22 }}>{s.name}</div>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{s.tagline}</div>
+              </div>
+              <div
+                style={{
+                  marginLeft: "auto",
+                  fontSize: 10,
+                  fontFamily: "var(--font-hanken), sans-serif",
+                  fontWeight: 700,
+                  letterSpacing: 1.5,
+                  textTransform: "uppercase",
+                  color: "var(--muted)",
+                  border: "1px solid var(--line)",
+                  borderRadius: 6,
+                  padding: "3px 8px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Coming Soon
+              </div>
+            </div>
+          )
+        )}
+      </div>
+
+      <Link
+        href="/careers"
+        style={{
+          marginTop: 16,
+          textAlign: "center",
+          textDecoration: "none",
+          color: "var(--muted)",
+          fontFamily: "var(--font-hanken), sans-serif",
+          fontSize: 13,
+          padding: "10px",
+          border: "1px solid var(--line)",
+          borderRadius: 11,
+        }}
+      >
+        📁 My saved careers
+      </Link>
+    </div>
+  );
+}

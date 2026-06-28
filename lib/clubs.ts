@@ -37,6 +37,11 @@ const LEAGUE_CLUBS: Record<string, [string, number, string][]> = {
     ["Inter Miami", 3, "#f7b5cd"], ["LAFC", 3, "#c39e6d"], ["LA Galaxy", 4, "#1a4fbf"], ["Seattle Sounders", 4, "#5d9741"],
     ["Atlanta Utd", 4, "#9a1530"], ["Columbus Crew", 4, "#e0c200"], ["FC Cincinnati", 4, "#f05323"],
   ],
+  "Saudi Pro League": [
+    ["Al-Hilal", 3, "#003399"], ["Al-Nassr", 3, "#c8a826"],
+    ["Al-Ittihad", 3, "#f8d000"], ["Al-Ahli", 3, "#005f32"],
+    ["Al-Qadsiah", 4, "#1a5f9c"],
+  ],
   Other: [
     ["Flamengo", 4, "#d4202a"], ["Boca Juniors", 4, "#0a3d91"], ["Peñarol", 4, "#d6a500"], ["Dinamo Zagreb", 4, "#0067b1"],
     ["Génération Foot", 4, "#1b9e4b"], ["Enyimba", 4, "#cf1020"], ["Kawasaki", 4, "#0a8fd6"], ["Molde", 4, "#1d4e9c"],
@@ -68,7 +73,7 @@ export const COUNTRIES: Country[] = [
   { name: "Brazil", flag: "🇧🇷", club: "Flamengo", strength: 5, cup: "Copa América" },
   { name: "Argentina", flag: "🇦🇷", club: "Boca Juniors", strength: 5, cup: "Copa América" },
   { name: "Spain", flag: "🇪🇸", club: "Real Betis", strength: 4, cup: "European Championship" },
-  { name: "England", flag: "🏴", club: "Southampton", strength: 4, cup: "European Championship" },
+  { name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", club: "Southampton", strength: 4, cup: "European Championship" },
   { name: "Portugal", flag: "🇵🇹", club: "Sporting CP", strength: 4, cup: "European Championship" },
   { name: "Germany", flag: "🇩🇪", club: "Stuttgart", strength: 4, cup: "European Championship" },
   { name: "Netherlands", flag: "🇳🇱", club: "Ajax", strength: 4, cup: "European Championship" },
@@ -91,3 +96,13 @@ export const POSITIONS: Position[] = [
 
 export const EXPECTED: Record<number, number> = { 1: 84, 2: 79, 3: 74, 4: 67 };
 export const TIER_LABEL: Record<number, string> = { 1: "Elite", 2: "Big club", 3: "Mid-table", 4: "Smaller side" };
+
+export const MONEY_CLUBS: { name: string; league: string }[] = [
+  { name: "Al-Hilal", league: "Saudi Pro League" },
+  { name: "Al-Nassr", league: "Saudi Pro League" },
+  { name: "Al-Ittihad", league: "Saudi Pro League" },
+  { name: "Al-Ahli", league: "Saudi Pro League" },
+  { name: "Inter Miami", league: "MLS" },
+  { name: "LAFC", league: "MLS" },
+  { name: "LA Galaxy", league: "MLS" },
+];

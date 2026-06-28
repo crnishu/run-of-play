@@ -1,0 +1,135 @@
+import { legacy, careerScore } from "@/lib/decisions";
+import Stat from "./ui/Stat";
+import Tag from "./ui/Tag";
+import Spark from "./ui/Spark";
+import Flag from "./ui/Flag";
+import { useState } from "react";
+import type { Player, Career, Season } from "@/lib/types";
+
+export default function CareerCard({
+  player,
+  career,
+  history,
+  onRestart,
+  onShare,
+  onSaveCareer,
+  saveCareerStatus = "idle",
+  restartLabel = "Start a new career ↻",
+}: {
+  player: Player;
+  career: Career;
+  history: Season[];
+  onRestart: () => void;
+  onShare?: () => void;
+  onSaveCareer?: () => void;
+  saveCareerStatus?: "idle" | "saving" | "saved" | "error";
+  restartLabel?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  function handleShare() {
+    onShare?.();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+  const leg = legacy(career);
+  const score = careerScore(career);
+  const total = (player.earnings + player.brandEarnings).toFixed(0);
+  return (
+    <div className="fade scrollbox" style={{ maxHeight: 660 }}>
+      <div style={{ textAlign: "center", marginBottom: 8 }}>
+        <div className="lbl">Career Complete · {history.length} seasons · came through {player.academy}</div>
+      </div>
+      <div className="card" style={{ borderColor: leg.color, boxShadow: `0 0 30px ${leg.color}22` }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 44 }}>{leg.emoji}</div>
+          <div className="ttl" style={{ fontSize: 30, color: leg.color }}>{leg.tier}</div>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 3, margin: "10px 0 4px" }}>
+            <span style={{ fontFamily: "var(--font-anton), sans-serif", fontSize: 58, lineHeight: 1, color: leg.color }}>{score}</span>
+            <span style={{ fontFamily: "var(--font-anton), sans-serif", fontSize: 24, color: "var(--muted)" }}>/100</span>
+          </div>
+          <div className="lbl" style={{ marginBottom: 10 }}>Career Score</div>
+          <div className="ttl" style={{ fontSize: 20, marginTop: 2 }}><Flag emoji={player.country.flag} size={24} /> {player.name}</div>
+          <div style={{ fontSize: 11.5, color: "var(--muted)" }}>
+            {player.position} · Peak OVR {career.peakOvr} · Age {history[0].age}–{player.age}
+          </div>
+          <div style={{ fontSize: 11.5, color: "var(--gold)", marginTop: 2 }}>
+            Peak value €{player.peakMarketValue}M · €{total}M earned
+          </div>
+        </div>
+        <div style={{ margin: "14px 0 6px" }}>
+          <div className="lbl" style={{ marginBottom: 4 }}>OVR trajectory</div>
+          <Spark values={history.map((s) => s.ovr)} />
+        </div>
+        <div className="lbl" style={{ marginTop: 12 }}>Club career</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, margin: "8px 0 14px" }}>
+          <Stat label="Apps" value={career.clubApps} count />
+          <Stat label="Goals" value={career.clubGoals} accent="var(--lime)" count />
+          <Stat label="Assists" value={career.clubAssists} count />
+          <Stat label="Clean Sh." value={career.clubClean} count />
+        </div>
+        <div className="lbl">International</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, margin: "8px 0 14px" }}>
+          <Stat label="Caps" value={career.caps} count />
+          <Stat label="Intl Goals" value={career.intlGoals} accent="var(--lime)" count />
+          <Stat label="World Cups" value={career.worldCups} accent="var(--gold)" count />
+          <Stat label="Cont. Cups" value={career.contCups} accent="var(--gold)" count />
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 7, justifyContent: "center", paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+          {career.ballonDors > 0 && <Tag gold>🏆 {career.ballonDors}× Ballon d&apos;Or</Tag>}
+          {career.worldCups > 0 && <Tag gold>🌍 {career.worldCups}× World Cup</Tag>}
+          {career.contCups > 0 && <Tag gold>🏅 {career.contCups}× Continental</Tag>}
+          {career.ucls > 0 && <Tag gold>🌟 {career.ucls}× Champions League</Tag>}
+          {career.leagueTitles > 0 && <Tag>🏅 {career.leagueTitles}× League</Tag>}
+          {career.cups > 0 && <Tag>🥇 {career.cups}× Cup</Tag>}
+          {career.ballonDors + career.worldCups + career.contCups + career.ucls + career.leagueTitles + career.cups === 0 && (
+            <Tag>No major silverware</Tag>
+          )}
+        </div>
+      </div>
+      {onSaveCareer && (
+        <button
+          className="chip"
+          style={{
+            width: "100%",
+            marginTop: 16,
+            textAlign: "center",
+            ...(saveCareerStatus === "saved" ? { borderColor: "var(--lime)" } : {}),
+          }}
+          onClick={onSaveCareer}
+          disabled={saveCareerStatus === "saving" || saveCareerStatus === "saved"}
+        >
+          <div className="ttl" style={{ fontSize: 15, color: saveCareerStatus === "saved" ? "var(--lime)" : saveCareerStatus === "error" ? "#ff6b6b" : "var(--gold)" }}>
+            {saveCareerStatus === "saving" ? "Saving…"
+              : saveCareerStatus === "saved" ? "✓ Saved to my careers"
+              : saveCareerStatus === "error" ? "Save failed — try again"
+              : "💾 Save to my careers"}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--muted)" }}>
+            {saveCareerStatus === "saved" ? "Find it in your My Careers menu." : "Keep this career in your collection."}
+          </div>
+        </button>
+      )}
+      <button className="btn primary" style={{ width: "100%", marginTop: onSaveCareer ? 8 : 16 }} onClick={onRestart}>
+        {restartLabel}
+      </button>
+      {onShare && (
+        <button
+          className="chip"
+          style={{ width: "100%", marginTop: 8, textAlign: "center" }}
+          onClick={handleShare}
+        >
+          <div className="ttl" style={{ fontSize: 15, color: copied ? "var(--lime)" : undefined }}>
+            {copied ? "✓ Link copied!" : "🔗 Share this career"}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--muted)" }}>
+            {copied ? "Send it to a friend." : "Copy a link anyone can open."}
+          </div>
+        </button>
+      )}
+      <div style={{ textAlign: "center", fontSize: 11, color: "var(--muted)", marginTop: 10, paddingBottom: 4 }}>
+        Screenshot your card and challenge a friend.
+      </div>
+    </div>
+  );
+}

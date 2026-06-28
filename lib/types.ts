@@ -47,6 +47,7 @@ export interface Season {
   graduated: boolean;
   gradBoost: number;
   mv: number;
+  tierChange: number;
 }
 
 export interface Player {
@@ -81,6 +82,10 @@ export interface Player {
   wantAway: boolean;
   lastApps: number;
   lastRole: string;
+  consecutiveBench: number;
+  peakAge: number;
+  declineAge: number;
+  fastDeclineAge: number;
 }
 
 export interface Career {
@@ -125,4 +130,14 @@ export interface Decision {
 export interface Renewal {
   years: number;
   wage: number;
+}
+
+export interface ShareData {
+  n: string; p: string; ff: string; cn: string; ac: string;
+  ag: number; s0: number; sn: number;
+  apps: number; g: number; a: number; cl: number;
+  caps: number; ig: number;
+  wc: number; cc: number; ucl: number; t: number; cups: number; bd: number;
+  povr: number; pmv: number; earn: number;
+  ovrs: number[];
 }

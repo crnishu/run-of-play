@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Hanken_Grotesk } from "next/font/google";
+import Providers from "@/components/Providers";
+import FeedbackButton from "@/components/FeedbackButton";
 import "./globals.css";
 
 const anton = Anton({
@@ -15,14 +17,17 @@ const hanken = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Run of Play",
+  title: "Ryze Sports",
   description: "One career. No restarts.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${anton.variable} ${hanken.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+        <FeedbackButton />
+      </body>
     </html>
   );
 }

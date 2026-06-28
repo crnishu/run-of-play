@@ -1,0 +1,219 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import CareerCard from "./CareerCard";
+import AuthModal from "./AuthModal";
+import Flag from "./ui/Flag";
+import type { Player, Career, Season } from "@/lib/types";
+
+interface CareerSummary {
+  name: string;
+  flag: string;
+  country: string;
+  position: string;
+  academy: string;
+  peakOvr: number;
+  ageStart: number;
+  ageEnd: number;
+  seasons: number;
+  score: number;
+  tier: string;
+  color: string;
+  emoji: string;
+  apps: number;
+  goals: number;
+  assists: number;
+  caps: number;
+  ballonDors: number;
+  worldCups: number;
+  contCups: number;
+  ucls: number;
+  leagueTitles: number;
+  cups: number;
+}
+
+interface CareerListItem {
+  id: string;
+  name: string;
+  sport: string;
+  summary: CareerSummary;
+  createdAt: string;
+}
+
+interface FullCareer {
+  player: Player;
+  career: Career;
+  history: Season[];
+}
+
+export default function SavedCareers() {
+  const { status } = useSession();
+  const [careers, setCareers] = useState<CareerListItem[] | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [viewing, setViewing] = useState<FullCareer | null>(null);
+  const [loadingView, setLoadingView] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    let active = true;
+    fetch("/api/careers")
+      .then((r) => (r.ok ? r.json() : { careers: [] }))
+      .then((d) => { if (active) setCareers(d.careers ?? []); })
+      .catch(() => { if (active) setCareers([]); });
+    return () => { active = false; };
+  }, [status]);
+
+  async function openCareer(id: string) {
+    setLoadingView(true);
+    try {
+      const res = await fetch(`/api/careers/${id}`);
+      if (!res.ok) return;
+      const { career } = await res.json();
+      setViewing(career.data as FullCareer);
+    } catch { /* ignore */ }
+    finally { setLoadingView(false); }
+  }
+
+  async function deleteCareer(id: string) {
+    if (!confirm("Delete this saved career? This can't be undone.")) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/careers/${id}`, { method: "DELETE" });
+      if (res.ok) setCareers((prev) => prev?.filter((c) => c.id !== id) ?? null);
+    } catch { /* ignore */ }
+    finally { setDeletingId(null); }
+  }
+
+  // --- Detail overlay ---
+  if (viewing) {
+    return (
+      <div className="scuk" style={{ background: "#0a1410" }}>
+        <CareerCard
+          player={viewing.player}
+          career={viewing.career}
+          history={viewing.history}
+          restartLabel="← Back to my careers"
+          onRestart={() => setViewing(null)}
+        />
+      </div>
+    );
+  }
+
+  // --- Loading session ---
+  if (status === "loading") {
+    return (
+      <div style={{ width: "100%", maxWidth: 480, textAlign: "center", color: "var(--muted)", padding: 40 }}>
+        Loading…
+      </div>
+    );
+  }
+
+  // --- Not signed in ---
+  if (status === "unauthenticated") {
+    return (
+      <div style={{ width: "100%", maxWidth: 480 }}>
+        <TitleBar />
+        <div className="card" style={{ textAlign: "center", padding: "32px 24px" }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>🔒</div>
+          <div className="ttl" style={{ fontSize: 20, marginBottom: 6 }}>Sign in to view your careers</div>
+          <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 18 }}>
+            Your saved careers are tied to your account.
+          </div>
+          <button className="btn primary" style={{ width: "100%" }} onClick={() => setShowAuth(true)}>
+            Sign in / Register
+          </button>
+        </div>
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      </div>
+    );
+  }
+
+  // --- Signed in ---
+  return (
+    <div style={{ width: "100%", maxWidth: 480 }}>
+      <TitleBar />
+
+      {loadingView && (
+        <div style={{ textAlign: "center", color: "var(--muted)", fontSize: 12, marginBottom: 8 }}>
+          Opening career…
+        </div>
+      )}
+
+      {careers === null ? (
+        <div style={{ textAlign: "center", color: "var(--muted)", padding: 40 }}>Loading your careers…</div>
+      ) : careers.length === 0 ? (
+        <div className="card" style={{ textAlign: "center", padding: "32px 24px" }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>📁</div>
+          <div className="ttl" style={{ fontSize: 20, marginBottom: 6 }}>No saved careers yet</div>
+          <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 18 }}>
+            Finish a career and hit “Save to my careers” to start your collection.
+          </div>
+          <Link href="/soccer" className="btn primary" style={{ display: "block", width: "100%", textDecoration: "none", textAlign: "center" }}>
+            Play a career →
+          </Link>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {careers.map((c) => {
+            const s = c.summary;
+            const trophies =
+              (s.ballonDors ?? 0) + (s.worldCups ?? 0) + (s.contCups ?? 0) +
+              (s.ucls ?? 0) + (s.leagueTitles ?? 0) + (s.cups ?? 0);
+            return (
+              <div
+                key={c.id}
+                className="chip"
+                style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer", padding: "12px 14px" }}
+                onClick={() => openCareer(c.id)}
+              >
+                <div style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>{s.emoji}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="ttl" style={{ fontSize: 16, lineHeight: 1.1 }}>
+                    <Flag emoji={s.flag} size={16} /> {s.name}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
+                    {s.position} · Peak OVR {s.peakOvr} · {s.seasons} seasons
+                  </div>
+                  <div style={{ fontSize: 11, color: s.color, fontWeight: 700, marginTop: 2 }}>
+                    {s.tier}{trophies > 0 ? ` · ${trophies} trophies` : ""}
+                  </div>
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 1, justifyContent: "flex-end" }}>
+                    <span style={{ fontFamily: "var(--font-anton), sans-serif", fontSize: 24, color: s.color, lineHeight: 1 }}>{s.score}</span>
+                    <span style={{ fontFamily: "var(--font-anton), sans-serif", fontSize: 11, color: "var(--muted)" }}>/100</span>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deleteCareer(c.id); }}
+                    disabled={deletingId === c.id}
+                    style={{
+                      marginTop: 6, background: "none", border: "none", color: "var(--muted)",
+                      cursor: "pointer", fontSize: 11, fontFamily: "var(--font-hanken), sans-serif",
+                      textDecoration: "underline", padding: 0,
+                    }}
+                  >
+                    {deletingId === c.id ? "…" : "Delete"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TitleBar() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+      <div className="ttl" style={{ fontSize: 26, color: "var(--lime)" }}>MY CAREERS</div>
+      <Link href="/" style={{ fontSize: 12, color: "var(--muted)", textDecoration: "none", fontFamily: "var(--font-hanken), sans-serif" }}>
+        ← Home
+      </Link>
+    </div>
+  );
+}

@@ -5,14 +5,16 @@ export default function Timeline({
   history,
   scrollRef,
   position,
+  maxH = 96,
 }: {
   history: Season[];
-  scrollRef: RefObject<HTMLDivElement | null>;
+  scrollRef?: RefObject<HTMLDivElement | null>;
   position: string;
+  maxH?: number;
 }) {
   if (history.length < 2) return null;
   return (
-    <div ref={scrollRef} className="scrollbox card" style={{ marginTop: 12, maxHeight: 96, padding: "6px 12px" }}>
+    <div ref={scrollRef} className="scrollbox card" style={{ marginTop: 12, maxHeight: maxH, padding: "6px 12px" }}>
       {history.slice(0, -1).map((s, i) => (
         <div
           key={i}
@@ -28,6 +30,7 @@ export default function Timeline({
             {s.trophies.length ? " 🏆" : ""}
             {s.ballon ? " 👑" : ""}
             {s.tourney && s.tourney.result === "Winner" ? (s.tourney.isWC ? " 🌍" : " 🏅") : ""}
+            {s.tierChange === 1 ? " 🔻" : s.tierChange === -1 ? " 🔼" : ""}
           </span>
         </div>
       ))}

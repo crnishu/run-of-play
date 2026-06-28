@@ -9,6 +9,7 @@
   --muted: #6f8a7c;
   --lime: #b6ff3d;
   --gold: #ffcc3d;
+  --brand: #3f7bff;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -65,7 +66,12 @@ body {
 
 .btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
 .btn:active { transform: translateY(0); }
-.primary { background: var(--lime); color: #06200d; }
+.primary {
+  /* FUT redesign — original was: background: var(--lime); (no gradient, no shadow) */
+  background: linear-gradient(180deg, #c9ff5a 0%, #a6f02f 100%);
+  color: #06200d;
+  box-shadow: 0 6px 18px rgba(166, 240, 47, .25), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
 
 .chip {
   border: 1px solid var(--line);
@@ -86,6 +92,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05); /* FUT redesign — original had no box-shadow */
 }
 
 .fade { animation: fade .42s ease; }
@@ -121,3 +128,163 @@ input.nm:focus { outline: none; border-color: var(--lime); }
   text-transform: uppercase;
   color: var(--muted);
 }
+
+.fbk {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-hanken), sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 14px;
+  border-radius: 22px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
+  transition: transform .12s, border-color .12s, background .12s;
+}
+.fbk:hover { transform: translateY(-2px); border-color: var(--lime); background: #16301f; }
+
+/* Desktop two-column layout */
+.game-outer {
+  width: 100%;
+  max-width: 480px;
+}
+
+@media (min-width: 880px) {
+  .game-outer {
+    max-width: 860px;
+    display: grid;
+    grid-template-columns: 480px 1fr;
+    gap: 20px;
+    align-items: start;
+    margin-top: 24px;
+  }
+
+  .game-sidebar {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 32px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .game-sidebar::-webkit-scrollbar { width: 4px; }
+  .game-sidebar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+}
+
+/* ===================================================================== */
+/* FUT-style collectible player cards  [BEGIN FUT REDESIGN]               */
+/* To revert the design: delete everything from this banner down to the   */
+/* matching [END FUT REDESIGN] banner, and undo the two inline-noted       */
+/* tweaks above (.primary and .card). See design-backup/ for full copies.  */
+/* ===================================================================== */
+
+.futwrap { display: flex; justify-content: center; padding: 4px 0 2px; }
+
+.futcard {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  padding: 26px 22px 20px;
+  overflow: hidden;
+  isolation: isolate;
+  color: #2a2208;
+  border-radius: 16px;
+  clip-path: polygon(0 5%, 16% 0, 84% 0, 100% 5%, 100% 100%, 0 100%);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .5);
+}
+
+/* Metal frames — map to legacy tiers via cardTier() */
+.fut--icon     { background: linear-gradient(157deg, #fff7e2 0%, #f4dd9b 22%, #dcb863 48%, #b8923a 72%, #f3da8c 100%); }
+.fut--goldrare { background: linear-gradient(157deg, #1b1b1f 0%, #2a2a2f 40%, #14140f 100%); color: #f7e6a8; }
+.fut--gold     { background: linear-gradient(157deg, #f3df97 0%, #ddbe5f 45%, #c39b3c 72%, #e9cf80 100%); }
+.fut--silver   { background: linear-gradient(157deg, #f7f9fb 0%, #d3dae1 42%, #aeb7c1 72%, #eaeff3 100%); color: #262b31; }
+.fut--bronze   { background: linear-gradient(157deg, #f1cda4 0%, #d0975f 44%, #a96e38 72%, #e1ad77 100%); color: #37200d; }
+.fut--faded    { background: linear-gradient(157deg, #c9b39c 0%, #a8855f 46%, #7d5e3c 74%, #bfa182 100%); color: #2e1f12; }
+
+/* Premium tiers glow */
+.fut--icon     { box-shadow: 0 0 34px rgba(255, 213, 92, .4), 0 18px 44px rgba(0, 0, 0, .55); }
+.fut--goldrare { box-shadow: 0 0 34px rgba(247, 230, 168, .28), 0 18px 44px rgba(0, 0, 0, .6); }
+
+/* Bevel outline */
+.futcard__bevel {
+  content: ''; position: absolute; inset: 7px; z-index: 1; pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 11px;
+  clip-path: polygon(0 5%, 16% 0, 84% 0, 100% 5%, 100% 100%, 0 100%);
+}
+.fut--goldrare .futcard__bevel { border-color: rgba(247, 230, 168, .35); }
+
+/* Shine sweep */
+.futcard::after {
+  content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .55) 47%, rgba(255, 255, 255, .12) 55%, transparent 72%);
+  transform: translateX(-130%);
+  animation: futshine 1.15s ease .2s 1;
+}
+@keyframes futshine { to { transform: translateX(130%); } }
+
+.futcard__inner { position: relative; z-index: 2; }
+
+.futcard__top { display: flex; gap: 14px; align-items: flex-start; }
+.futcard__rating { text-align: center; line-height: .82; flex-shrink: 0; }
+.futcard__rating b { font-family: var(--font-anton), sans-serif; font-size: 50px; display: block; }
+.futcard__rating em { font-family: var(--font-anton), sans-serif; font-size: 17px; font-style: normal; letter-spacing: 1px; display: block; margin-top: 3px; }
+.futcard__rating small { font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase; opacity: .7; display: block; margin-top: 5px; }
+.futcard__hairline { height: 2px; background: currentColor; opacity: .22; margin: 7px 0; }
+
+.futcard__name {
+  font-family: var(--font-anton), sans-serif;
+  font-size: 28px; text-transform: uppercase; letter-spacing: .5px;
+  text-align: center; margin: 12px 0 2px; line-height: 1;
+}
+.futcard__sub { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: .72; }
+
+.futcard__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 6px; margin-top: 14px; }
+.futcard__stat { text-align: center; }
+.futcard__stat b { font-family: var(--font-anton), sans-serif; font-size: 22px; display: block; line-height: 1; }
+.futcard__stat span { font-size: 8.5px; letter-spacing: 1.3px; text-transform: uppercase; opacity: .7; }
+
+.futcard__tier {
+  display: inline-flex; align-items: center; gap: 5px; margin: 2px auto 0;
+  font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+  padding: 3px 12px; border-radius: 20px; border: 1px solid currentColor;
+}
+
+.futcard__trophies { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 12px; }
+.futcard__trophy {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .3px;
+  padding: 3px 9px; border-radius: 14px;
+  background: rgba(0, 0, 0, .14); border: 1px solid rgba(0, 0, 0, .18);
+}
+.fut--goldrare .futcard__trophy { background: rgba(247, 230, 168, .12); border-color: rgba(247, 230, 168, .3); }
+
+/* ===== Mini cards for the collection binder ===== */
+.futmini {
+  position: relative; overflow: hidden; isolation: isolate;
+  border-radius: 12px; padding: 12px 13px; color: #2a2208; cursor: pointer;
+  clip-path: polygon(0 6%, 14% 0, 86% 0, 100% 6%, 100% 100%, 0 100%);
+  transition: transform .14s ease, box-shadow .14s ease;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+}
+.futmini:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(0, 0, 0, .45); }
+.futmini::after {
+  content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .5) 50%, transparent 65%);
+  transform: translateX(-130%);
+}
+.futmini:hover::after { animation: futshine .85s ease; }
+.futmini__inner { position: relative; z-index: 2; display: flex; align-items: center; gap: 11px; }
+
+/* ===================================================================== */
+/* [END FUT REDESIGN]                                                     */
+/* ===================================================================== */

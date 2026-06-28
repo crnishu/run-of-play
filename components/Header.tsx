@@ -1,6 +1,7 @@
 import { hexToRgba, clubGlow, ovrColor } from "@/lib/helpers";
 import Stat from "./ui/Stat";
 import Trend from "./ui/Trend";
+import Flag from "./ui/Flag";
 import type { Player, Career } from "@/lib/types";
 
 export default function Header({ player, career }: { player: Player; career: Career }) {
@@ -8,7 +9,7 @@ export default function Header({ player, career }: { player: Player; career: Car
   return (
     <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 15px", borderColor: hexToRgba(clubGlow(player.club), 0.6) }}>
       <div>
-        <div className="ttl" style={{ fontSize: 18 }}>{player.country.flag} {player.name}</div>
+        <div className="ttl" style={{ fontSize: 18 }}><Flag emoji={player.country.flag} size={20} /> {player.name}</div>
         <div style={{ fontSize: 11.5, color: "var(--muted)" }}>
           {player.position} · <span style={{ color: clubGlow(player.club) }}>{player.club}</span>
         </div>

@@ -34,3 +34,15 @@ export const roleColor: Record<string, string> = {
   bench: "#ff7a7a",
   youth: "var(--gold)",
 };
+
+// Maps a legacy tier name to a FUT-style card metal (drives the .fut--* classes)
+export function cardTier(tier: string): "icon" | "goldrare" | "gold" | "silver" | "bronze" | "faded" {
+  switch (tier) {
+    case "Generational Icon": return "icon";
+    case "World-Class Legend": return "goldrare";
+    case "Top-Tier Star": return "gold";
+    case "Solid Pro": return "silver";
+    case "Journeyman": return "bronze";
+    default: return "faded";
+  }
+}
